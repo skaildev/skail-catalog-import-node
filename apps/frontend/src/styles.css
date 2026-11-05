@@ -1,0 +1,130 @@
+:root {
+  color-scheme: light dark;
+  --accent: #2563eb;
+  --muted: #6b7280;
+  --ok: #16a34a;
+  --bad: #dc2626;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font:
+    16px/1.5 system-ui,
+    sans-serif;
+  background: Canvas;
+  color: CanvasText;
+}
+main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+h1 {
+  margin: 0;
+}
+h2 {
+  font-size: 1rem;
+  margin: 2rem 0 0.5rem;
+}
+.subtitle {
+  color: var(--muted);
+  margin-top: 0.25rem;
+}
+.controls {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin: 1.5rem 0 1rem;
+}
+button {
+  font: inherit;
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  min-width: 9rem;
+}
+button:disabled,
+label:has(input:disabled) {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.status {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  color: var(--muted);
+}
+.badge {
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: var(--muted);
+  color: #fff;
+  font-size: 0.85rem;
+}
+.badge.active {
+  background: var(--accent);
+}
+.badge.done {
+  background: var(--ok);
+}
+.badge.failed {
+  background: var(--bad);
+}
+.error {
+  color: var(--bad);
+}
+.detail {
+  color: var(--ok);
+}
+.hint {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+label {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+th,
+td {
+  text-align: left;
+  padding: 0.3rem 0.5rem;
+  border-bottom: 1px solid color-mix(in srgb, CanvasText 15%, transparent);
+}
+footer {
+  margin-top: 2rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.progress {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin: 1rem 0;
+  font-variant-numeric: tabular-nums;
+}
+.bar {
+  flex: 1;
+  height: 0.75rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, CanvasText 15%, transparent);
+  overflow: hidden;
+}
+.fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.3s;
+}
+tr.retried td {
+  background: color-mix(in srgb, var(--bad) 15%, transparent);
+}

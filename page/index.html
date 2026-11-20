@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Catalog import · skail demo</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 26'%3E%3Cpath d='M25.4385 18.2557L7.28223 18.2538L7.28125 4.53796C7.28123 3.98936 7.21634 0.353387 7.32422 0.00280762C13.2929 0.0779445 19.4626 0.0104719 25.4414 0.00280762L25.4385 18.2557ZM10.917 7.30261L18.1797 7.30164L18.1777 14.6083L21.8213 14.6102V3.6532C18.2322 3.65317 14.494 3.70895 10.918 3.64734L10.917 7.30261Z' fill='%2368057F'/%3E%3Cpath d='M0 14.609L3.6314 14.6068L3.6293 21.8979L10.9159 21.8957L10.9154 25.5448L2.61941e-05 25.5414L0 14.609Z' fill='%23E8611C'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* skail brand tokens, from skail.dev */
+    :root {
+      --bg: #ffffff; --bg2: #f7f7f8; --bg3: #f0f0f2; --card: #fafafb;
+      --ink: #111114; --ink2: #4b4c54; --ink3: #8a8b94;
+      --line: #ebebee; --line2: #dfdfe4;
+      --brand: #68057F; --brand2: #8b2fa8; --brand-soft: #f5edf8; --orange: #E8611C;
+      --ok: #17914f; --ok-soft: #e8f6ee; --run: #2d6be4; --run-soft: #e9f0fd;
+      --err: #d6363b; --err-soft: #fcebec; --warn: #b7791f; --warn-soft: #fdf4e3;
+      --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+      --r: 14px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg2); color: var(--ink); font: 16px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
+    a { color: var(--brand); }
+    .nav { background: var(--bg); border-bottom: 1px solid var(--line); }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 0 20px; }
+    .nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+    .logo { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 19px; letter-spacing: -.03em; color: var(--ink); text-decoration: none; }
+    .chip { font-size: 12px; padding: 2px 9px; border-radius: 7px; border: 1px solid var(--line2); background: var(--bg); color: var(--ink2); font-weight: 500; }
+    main.wrap { padding-top: 44px; padding-bottom: 60px; }
+    h1 { font-size: clamp(30px, 4.5vw, 44px); line-height: 1.05; letter-spacing: -.04em; font-weight: 500; margin: 0 0 12px; }
+    .lead { color: var(--ink2); max-width: 720px; margin: 0 0 28px; }
+    .bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .btn { display: inline-flex; align-items: center; height: 40px; padding: 0 18px; border-radius: 999px; border: 0; font: 500 14px var(--sans); cursor: pointer; }
+    .btn-dark { background: var(--ink); color: #fff; }
+    .btn-brand { background: var(--brand); color: #fff; }
+    .btn-line { background: var(--bg); color: var(--err); border: 1px solid var(--line2); }
+    .btn:disabled { opacity: .35; cursor: not-allowed; }
+    .muted { color: var(--ink3); font-size: 14px; }
+    .mono { font-family: var(--mono); }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .card { background: var(--bg); border: 1px solid var(--line); border-radius: var(--r); padding: 20px; }
+    .card h2 { display: flex; justify-content: space-between; align-items: center; font-size: 17px; font-weight: 600; margin: 0 0 14px; letter-spacing: -.01em; }
+    .actions { display: flex; align-items: center; gap: 8px; }
+    .pill { font-size: 12px; font-weight: 500; padding: 3px 10px; border-radius: 999px; }
+    .running { background: var(--run-soft); color: var(--run); }
+    .pill, td.mono { white-space: nowrap; }
+    select { height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line2); background: var(--bg); font: 500 14px var(--sans); }
+    .written { background: var(--ok-soft); color: var(--ok); }
+    .rejected { background: var(--err-soft); color: var(--err); }
+    .writing, .running { background: var(--run-soft); color: var(--run); }
+    .completed { background: var(--ok-soft); color: var(--ok); }
+    .progress { height: 8px; border-radius: 999px; background: var(--bg3); overflow: hidden; margin: 4px 0 16px; }
+    .progress div { height: 100%; background: var(--brand); transition: width .3s; }
+    .stats { display: flex; gap: 28px; flex-wrap: wrap; }
+    .stats b { display: block; font-size: 22px; font-weight: 500; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--ink3); font-weight: 500; }
+    td.sample { color: var(--ink2); font-size: 13px; }
+    label.check { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--ink2); cursor: pointer; }
+    label.check input { width: 16px; height: 16px; accent-color: var(--brand); }
+    .empty { color: var(--ink3); font-size: 14px; }
+    footer { color: var(--ink3); font-size: 13px; margin-top: 28px; }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="wrap">
+      <a class="logo" href="https://skail.dev" target="_blank" rel="noopener">
+        <svg width="20" height="20" viewBox="0 0 26 26" fill="none" aria-hidden="true"><path d="M25.4385 18.2557L7.28223 18.2538L7.28125 4.53796C7.28123 3.98936 7.21634 0.353387 7.32422 0.00280762C13.2929 0.0779445 19.4626 0.0104719 25.4414 0.00280762L25.4385 18.2557ZM10.917 7.30261L18.1797 7.30164L18.1777 14.6083L21.8213 14.6102V3.6532C18.2322 3.65317 14.494 3.70895 10.918 3.64734L10.917 7.30261Z" fill="#68057F"/><path d="M0 14.609L3.6314 14.6068L3.6293 21.8979L10.9159 21.8957L10.9154 25.5448L2.61941e-05 25.5414L0 14.609Z" fill="#E8611C"/></svg>
+        skail <span class="chip">demo</span>
+      </a>
+      <a class="muted" href="https://docs.skail.dev" target="_blank" rel="noopener">Docs</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <h1>Catalog import</h1>
+    <p class="lead">A skail function imports the product catalog of a public API, 20 products per page, waiting 2
+      seconds between pages, the rate limit of the source. Each page is a command: when a page fails, skail retries only
+      that page, and when the app stops in the middle, the import goes on at the page where it stopped.</p>
+
+    <div class="bar">
+      <button id="start" class="btn btn-brand" onclick="start()">Import catalog</button>
+      <label class="check"><input id="reject" type="checkbox"> Make the target catalog reject page 3 twice</label>
+    </div>
+
+    <section id="summary" class="card" hidden>
+      <h2><span>Import <span id="importId" class="muted mono"></span></span><span id="status" class="pill"></span></h2>
+      <div class="progress"><div id="bar"></div></div>
+      <div id="stats" class="stats"></div>
+    </section>
+
+    <section id="pagesCard" class="card" style="margin-top: 16px" hidden>
+      <h2>Pages written to the target catalog</h2>
+      <table>
+        <thead><tr><th>Page</th><th>Products</th><th>Attempts</th><th>Status</th><th>First products</th></tr></thead>
+        <tbody id="pages"></tbody>
+      </table>
+    </section>
+
+    <p id="empty" class="empty">No import yet. The source is DummyJSON, with 194 products in 10 pages.</p>
+
+    <footer>This is a demo, not production code: the products come from the public DummyJSON API, and the target
+      catalog is simulated in the memory of the app. Each import is also a run in the <a href="https://docs.skail.dev/referencia/portal/monitor" target="_blank" rel="noopener">skail Monitor</a>.</footer>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const esc = (t) => String(t).replace(/</g, "&lt;");
+    const expectedPages = 10;
+    let state = null;
+
+    async function start() {
+      const response = await fetch(`/api/imports?rejectPage3=${$("reject").checked}`, { method: "POST" });
+      if (!response.ok && response.status !== 409) alert(`The app answered ${response.status}.`);
+      await refresh();
+    }
+
+    function render() {
+      const running = !!state && !state.result;
+      $("start").disabled = running;
+      $("start").textContent = running ? "Importing…" : "Import catalog";
+      $("empty").hidden = !!state;
+      $("summary").hidden = $("pagesCard").hidden = !state;
+      if (!state) return;
+
+      const written = state.pages.filter((p) => p.status === "written").length;
+      $("importId").textContent = state.id.slice(0, 8);
+      $("status").textContent = state.result ? "completed" : "running";
+      $("status").className = `pill ${state.result ? "completed" : "running"}`;
+      $("bar").style.width = `${state.result ? 100 : Math.min(100, (100 * written) / expectedPages)}%`;
+      $("stats").innerHTML = `<div><span class="muted">Products</span><b>${state.products}</b></div>
+        <div><span class="muted">Pages</span><b>${written}</b></div>`;
+
+      $("pages").innerHTML = state.pages.map((p) => `<tr><td class="mono">${p.page}</td><td>${p.products}</td>
+        <td>${p.attempts}</td><td><span class="pill ${p.status}">${p.status === "rejected" ? "rejected, retrying" : p.status}</span></td>
+        <td class="sample">${p.sample.map(esc).join(", ")}</td></tr>`).join("");
+    }
+
+    async function refresh() {
+      try { state = await (await fetch("/api/state")).json(); } catch { /* the app is restarting */ }
+      render();
+    }
+
+    refresh();
+    setInterval(refresh, 1000);
+  </script>
+</body>
+</html>
